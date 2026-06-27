@@ -433,7 +433,6 @@ class TestCLIIntegration:
             ["python", "-m", "codegraph", "index", str(multi_lang_project),
              "--output", str(output_file)],
             capture_output=True, text=True,
-            cwd="/root/codegraph",
         )
         assert result.returncode == 0
         data = json.loads(output_file.read_text())
@@ -448,7 +447,6 @@ class TestCLIIntegration:
             ["python", "-m", "codegraph", "query", str(multi_lang_project),
              "--search", "User", "--output", str(output_file)],
             capture_output=True, text=True,
-            cwd="/root/codegraph",
         )
         assert result.returncode == 0
         data = json.loads(output_file.read_text())
@@ -464,7 +462,6 @@ class TestCLIIntegration:
             ["python", "-m", "codegraph", "query", str(multi_lang_project),
              "--functions", "--output", str(output_file)],
             capture_output=True, text=True,
-            cwd="/root/codegraph",
         )
         assert result.returncode == 0
         data = json.loads(output_file.read_text())
@@ -478,7 +475,6 @@ class TestCLIIntegration:
             ["python", "-m", "codegraph", "query", str(multi_lang_project),
              "--classes", "--output", str(output_file)],
             capture_output=True, text=True,
-            cwd="/root/codegraph",
         )
         assert result.returncode == 0
         data = json.loads(output_file.read_text())
@@ -491,7 +487,6 @@ class TestCLIIntegration:
             ["python", "-m", "codegraph", "index", str(multi_lang_project),
              "--format", "stats"],
             capture_output=True, text=True,
-            cwd="/root/codegraph",
         )
         assert result.returncode == 0
         assert "Total symbols:" in result.stdout
@@ -503,7 +498,6 @@ class TestCLIIntegration:
             ["python", "-m", "codegraph", "index", str(multi_lang_project),
              "--format", "markdown"],
             capture_output=True, text=True,
-            cwd="/root/codegraph",
         )
         assert result.returncode == 0
         assert "# CodeGraph Analysis" in result.stdout
@@ -516,7 +510,6 @@ class TestCLIIntegration:
             ["python", "-m", "codegraph", "index", str(multi_lang_project),
              "--cache", str(cache_dir), "--output", str(output_file)],
             capture_output=True, text=True,
-            cwd="/root/codegraph",
         )
         assert result.returncode == 0
         assert "Delta index:" in result.stderr or "files to index" in result.stderr
