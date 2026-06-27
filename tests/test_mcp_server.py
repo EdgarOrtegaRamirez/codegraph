@@ -1,7 +1,5 @@
 """Tests for CodeGraph MCP Server."""
 
-import json
-import tempfile
 from pathlib import Path
 
 import pytest

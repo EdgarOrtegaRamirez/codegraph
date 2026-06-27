@@ -2,15 +2,13 @@
 
 import json
 import subprocess
-import tempfile
 from pathlib import Path
 
 import pytest
 
-from codegraph.graph import CodeGraph, Symbol, ImportInfo, CallEdge
+from codegraph.graph import CodeGraph
 from codegraph.indexer import Indexer
 from codegraph.incremental import IncrementalIndexer, CacheManager
-from codegraph.resolve import GraphQuery
 from codegraph.parsers.rust import RustParser
 
 

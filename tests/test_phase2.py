@@ -1,13 +1,10 @@
 """Tests for CodeGraph Phase 2: JS/TS parser, Go parser, resolve, and query."""
 
-import json
-import tempfile
 from pathlib import Path
 
 import pytest
 
 from codegraph.graph import CodeGraph, Symbol
-from codegraph.indexer import Indexer
 from codegraph.parsers.go import GoParser
 from codegraph.parsers.javascript import JavaScriptParser
 from codegraph.resolve import CrossRefResolver, GraphQuery

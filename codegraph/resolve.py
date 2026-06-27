@@ -52,15 +52,12 @@ class CrossRefResolver:
     def _find_import_targets(self, imp: Any) -> list[Symbol]:
         """Find symbols that match an import statement."""
         targets = []
-        module = imp.module
 
         # For relative imports, resolve relative to source file
         if imp.is_relative:
-            source_dir = str(Path(imp.source_file).parent)
-            module_path = Path(source_dir) / module.lstrip(".")
-            module_key = str(module_path).replace("/", ".")
+            _source_dir = str(Path(imp.source_file).parent)
         else:
-            module_key = module
+            pass
 
         # Try to find matching symbols
         for name in imp.names:

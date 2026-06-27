@@ -44,3 +44,4 @@ htmlcov/
 # CodeGraph output
 *.codegraph.json
 .codegraph-cache/
+uv.lock

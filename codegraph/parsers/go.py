@@ -178,7 +178,6 @@ class GoParser:
 
     def _extract_call_edges(self, source: str, rel: str, graph: CodeGraph) -> None:
         """Extract function/method call patterns."""
-        lines = source.split("\n")
         call_pattern = re.compile(r'(\w+(?:\.\w+)*)\s*\(')
         keywords = {"if", "else", "for", "switch", "case", "return",
                      "defer", "go", "select", "chan", "map", "make",

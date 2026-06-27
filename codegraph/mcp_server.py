@@ -10,7 +10,6 @@ Usage:
 
 from __future__ import annotations
 
-import sys
 from pathlib import Path
 from typing import Any
 
@@ -18,7 +17,6 @@ import anyio
 
 import mcp.server.stdio
 from mcp.server import Server
-from mcp.server.models import InitializationOptions
 from mcp.types import (
     Tool,
     TextContent,

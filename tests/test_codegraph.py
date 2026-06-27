@@ -7,7 +7,6 @@ from pathlib import Path
 import pytest
 
 from codegraph.graph import CodeGraph, Symbol
-from codegraph.indexer import Indexer
 from codegraph.output import format_markdown, format_stats
 from codegraph.parsers.python import PythonParser
 from codegraph.utils import discover_files, detect_language
@@ -169,7 +168,7 @@ class TestPythonParser:
         parser.parse_file(sample_file, sample_graph)
 
         # _private should be detected
-        private = next((s for s in sample_graph.symbols.values() if s.name.startswith("_")), None)
+        assert any(s.name.startswith("_") for s in sample_graph.symbols.values())
         # __init__ is a dunder, so public
         init = next((s for s in sample_graph.symbols.values() if s.name == "__init__"), None)
         assert init is not None

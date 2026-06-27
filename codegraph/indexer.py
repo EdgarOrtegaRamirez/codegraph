@@ -5,7 +5,7 @@ from __future__ import annotations
 import time
 from pathlib import Path
 
-from codegraph.graph import CodeGraph, GraphSummary
+from codegraph.graph import CodeGraph
 from codegraph.parsers.base import BaseParser
 from codegraph.parsers.go import GoParser
 from codegraph.parsers.javascript import JavaScriptParser

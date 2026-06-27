@@ -13,7 +13,6 @@ from pathlib import Path
 from typing import Any
 
 from codegraph.graph import CodeGraph
-from codegraph.indexer import Indexer
 from codegraph.utils import discover_files
 
 

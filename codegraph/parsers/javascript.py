@@ -8,7 +8,7 @@ parsing — no external dependencies.
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 
 from codegraph.graph import CallEdge, CodeGraph, ImportInfo, Symbol
@@ -55,7 +55,6 @@ class JavaScriptParser:
         self, source: str, rel: str, graph: CodeGraph
     ) -> None:
         """Extract function declarations, arrow functions, and methods."""
-        lines = source.split("\n")
 
         # Function declarations: function name(...)
         func_pattern = re.compile(
@@ -141,7 +140,6 @@ class JavaScriptParser:
 
     def _extract_classes(self, source: str, rel: str, graph: CodeGraph) -> None:
         """Extract class declarations and interfaces."""
-        lines = source.split("\n")
 
         # Class declarations
         class_pattern = re.compile(
@@ -233,7 +231,7 @@ class JavaScriptParser:
             for name in group.split(","):
                 name = name.strip().split(" as ")[0].strip()
                 if name:
-                    line_num = source[:source.find(f"export {{")].count("\n") + 1
+                    line_num = source[:source.find("export {")].count("\n") + 1
                     graph.add_symbol(Symbol(
                         name=name,
                         kind="function",
@@ -328,7 +326,6 @@ class JavaScriptParser:
 
     def _extract_call_edges(self, source: str, rel: str, graph: CodeGraph) -> None:
         """Extract function/method call patterns."""
-        lines = source.split("\n")
         # Find all function calls: identifier(...)
         call_pattern = re.compile(r'(\w+(?:\.\w+)*)\s*\(')
         for m in call_pattern.finditer(source):

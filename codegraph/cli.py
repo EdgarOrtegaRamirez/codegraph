@@ -11,7 +11,6 @@ from codegraph.indexer import Indexer
 from codegraph.incremental import IncrementalIndexer
 from codegraph.output import format_markdown, format_stats
 from codegraph.resolve import GraphQuery
-from codegraph.utils import ALL_EXTENSIONS
 
 
 def build_parser() -> argparse.ArgumentParser:

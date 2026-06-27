@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from pathlib import Path
 
 from codegraph.graph import CodeGraph
 
@@ -16,8 +15,8 @@ def format_markdown(graph: CodeGraph) -> str:
     # Summary
     s = graph.summary
     lines.append("## Summary\n")
-    lines.append(f"| Metric | Count |")
-    lines.append(f"|--------|-------|")
+    lines.append("| Metric | Count |")
+    lines.append("|--------|-------|")
     lines.append(f"| Total Symbols | {s.total_symbols} |")
     lines.append(f"| Total Files | {s.total_files} |")
     lines.append(f"| Functions | {s.total_functions} |")
@@ -92,17 +91,17 @@ def format_stats(graph: CodeGraph) -> str:
     """Format a simple stats output."""
     s = graph.summary
     lines = [
-        f"CodeGraph Statistics",
+        "CodeGraph Statistics",
         f"{'=' * 40}",
         f"Root: {graph.root_path}",
-        f"",
+        "",
         f"Total files:    {s.total_files}",
         f"Total symbols:  {s.total_symbols}",
         f"Functions:      {s.total_functions}",
         f"Classes:        {s.total_classes}",
         f"Imports:        {s.total_imports}",
         f"Call edges:     {s.total_edges}",
-        f"",
+        "",
     ]
     if s.languages:
         lines.append("Languages:")
