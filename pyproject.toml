@@ -43,3 +43,8 @@ include = ["codegraph*"]
 
 [tool.setuptools.dynamic]
 version = {attr = "codegraph.__version__"}
+
+[dependency-groups]
+dev = [
+    "ruff>=0.15.20",
+]
