@@ -77,10 +77,7 @@ def discover_files(
 
     for dirpath, dirnames, filenames in os.walk(root):
         # Modify dirnames in-place to skip ignored directories
-        dirnames[:] = [
-            d for d in dirnames
-            if d not in ignore and not d.startswith(".")
-        ]
+        dirnames[:] = [d for d in dirnames if d not in ignore and not d.startswith(".")]
         dirnames.sort()  # Ensure deterministic order
 
         for filename in sorted(filenames):

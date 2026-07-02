@@ -73,7 +73,9 @@ class CrossRefResolver:
         """Update reference counts for all symbols based on call edges."""
         for edge in self.graph.edges:
             # Extract the callee name
-            callee_name = edge.callee.split(".")[-1] if "." in edge.callee else edge.callee
+            callee_name = (
+                edge.callee.split(".")[-1] if "." in edge.callee else edge.callee
+            )
             for sym in self._symbols_by_name.get(callee_name, []):
                 sym.references += 1
 
@@ -137,8 +139,7 @@ class GraphQuery:
         for sym in self.graph.symbols.values():
             if kind and sym.kind != kind:
                 continue
-            if (query_lower in sym.name.lower() or
-                    query_lower in sym.docstring.lower()):
+            if query_lower in sym.name.lower() or query_lower in sym.docstring.lower():
                 results.append(self._symbol_to_dict(sym))
         return results
 
@@ -186,9 +187,7 @@ class GraphQuery:
         """
         results = []
         for sym in self.graph.symbols.values():
-            if sym.kind == "class" and (
-                file_path is None or sym.file == file_path
-            ):
+            if sym.kind == "class" and (file_path is None or sym.file == file_path):
                 results.append(self._symbol_to_dict(sym))
         return results
 
@@ -204,14 +203,16 @@ class GraphQuery:
         results = []
         for imp in self.graph.imports:
             if imp.source_file == file_path:
-                results.append({
-                    "module": imp.module,
-                    "names": imp.names,
-                    "alias": imp.alias,
-                    "is_relative": imp.is_relative,
-                    "line": imp.line,
-                    "kind": imp.kind,
-                })
+                results.append(
+                    {
+                        "module": imp.module,
+                        "names": imp.names,
+                        "alias": imp.alias,
+                        "is_relative": imp.is_relative,
+                        "line": imp.line,
+                        "kind": imp.kind,
+                    }
+                )
         return results
 
     def get_call_graph(self, symbol_key: str, depth: int = 2) -> dict[str, Any]:
@@ -237,7 +238,9 @@ class GraphQuery:
         callees = []
         for edge in self.graph.edges:
             if edge.caller == symbol_key:
-                callee_info = self._traverse_calls(edge.callee, depth - 1, visited.copy())
+                callee_info = self._traverse_calls(
+                    edge.callee, depth - 1, visited.copy()
+                )
                 callee_info["call_type"] = edge.call_type
                 callee_info["line"] = edge.line
                 callee_info["callee"] = edge.callee
@@ -256,13 +259,9 @@ class GraphQuery:
         even when symbols are added after query init.
         """
         total_functions = sum(
-            1 for s in self.graph.symbols.values()
-            if s.kind in ("function", "method")
+            1 for s in self.graph.symbols.values() if s.kind in ("function", "method")
         )
-        total_classes = sum(
-            1 for s in self.graph.symbols.values()
-            if s.kind == "class"
-        )
+        total_classes = sum(1 for s in self.graph.symbols.values() if s.kind == "class")
         total_files = len(set(s.file for s in self.graph.symbols.values()))
         return {
             "total_symbols": len(self.graph.symbols),

@@ -11,6 +11,7 @@ from typing import Any
 @dataclass
 class Symbol:
     """A symbol found in the codebase (function, class, method, import, etc.)."""
+
     name: str
     kind: str  # function, class, method, variable, import, module, decorator
     file: str  # relative path from project root
@@ -33,6 +34,7 @@ class Symbol:
 @dataclass
 class ImportInfo:
     """An import statement."""
+
     source_file: str
     module: str  # e.g., "os.path"
     names: list[str]  # e.g., ["join", "exists"]
@@ -45,6 +47,7 @@ class ImportInfo:
 @dataclass
 class CallEdge:
     """A call edge between two symbols."""
+
     caller: str  # "file.py:42"
     callee: str  # "module.Class.method"
     call_type: str = "direct"  # direct, dynamic, import, super
@@ -54,6 +57,7 @@ class CallEdge:
 @dataclass
 class GraphSummary:
     """Summary statistics for the graph."""
+
     total_symbols: int = 0
     total_files: int = 0
     total_functions: int = 0
@@ -67,6 +71,7 @@ class GraphSummary:
 @dataclass
 class CodeGraph:
     """The complete knowledge graph for a codebase."""
+
     symbols: dict[str, Symbol] = field(default_factory=dict)
     edges: list[CallEdge] = field(default_factory=list)
     imports: list[ImportInfo] = field(default_factory=list)

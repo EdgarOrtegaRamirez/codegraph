@@ -12,7 +12,7 @@ from codegraph.resolve import CrossRefResolver, GraphQuery
 
 # --- JS/TS Parser Tests ---
 
-SAMPLE_JAVASCRIPT = '''
+SAMPLE_JAVASCRIPT = """
 /**
  * A sample JavaScript module.
  */
@@ -50,9 +50,9 @@ async function main() {
 export const helper = (x) => x + 1;
 
 export default main;
-'''
+"""
 
-SAMPLE_TYPESCRIPT = '''
+SAMPLE_TYPESCRIPT = """
 interface User {
     id: number;
     name: string;
@@ -77,9 +77,9 @@ export class UserRepository {
 export function createUser(name: string): User {
     return { id: 1, name };
 }
-'''
+"""
 
-SAMPLE_GO = '''
+SAMPLE_GO = """
 package main
 
 import (
@@ -115,7 +115,7 @@ func main() {
     fmt.Println("Starting server...")
     http.ListenAndServe(fmt.Sprintf("%s:%d", config.Host, config.Port), handler)
 }
-'''
+"""
 
 
 @pytest.fixture
@@ -146,6 +146,7 @@ def empty_graph() -> CodeGraph:
 
 # --- JavaScript Parser Tests ---
 
+
 class TestJavaScriptParser:
     def test_parses_classes(self, js_file: Path, empty_graph: CodeGraph) -> None:
         parser = JavaScriptParser(js_file.parent)
@@ -164,7 +165,9 @@ class TestJavaScriptParser:
         names = {f.name for f in funcs}
         assert "main" in names
 
-    def test_parses_arrow_functions(self, js_file: Path, empty_graph: CodeGraph) -> None:
+    def test_parses_arrow_functions(
+        self, js_file: Path, empty_graph: CodeGraph
+    ) -> None:
         parser = JavaScriptParser(js_file.parent)
         parser.parse_file(js_file, empty_graph)
 
@@ -225,6 +228,7 @@ class TestJavaScriptParser:
 
 # --- Go Parser Tests ---
 
+
 class TestGoParser:
     def test_parses_structs(self, go_file: Path, empty_graph: CodeGraph) -> None:
         parser = GoParser(go_file)
@@ -282,14 +286,23 @@ class TestGoParser:
 
 # --- Cross-Reference Resolver Tests ---
 
+
 class TestCrossRefResolver:
     def test_resolves_imports(self, sample_graph: CodeGraph) -> None:
         sym = Symbol(
-            name="foo", kind="function", file="a.py", line=1, column=0,
+            name="foo",
+            kind="function",
+            file="a.py",
+            line=1,
+            column=0,
         )
         sample_graph.add_symbol(sym)
         sym2 = Symbol(
-            name="foo", kind="function", file="b.py", line=5, column=0,
+            name="foo",
+            kind="function",
+            file="b.py",
+            line=5,
+            column=0,
         )
         sample_graph.add_symbol(sym2)
 
@@ -302,18 +315,23 @@ class TestCrossRefResolver:
 
     def test_get_callers(self, sample_graph: CodeGraph) -> None:
         from codegraph.graph import CallEdge
-        sample_graph.add_edge(CallEdge(
-            caller="caller.py:10",
-            callee="target.py:5",
-            call_type="direct",
-            line=10,
-        ))
-        sample_graph.add_edge(CallEdge(
-            caller="caller.py:20",
-            callee="target.py:5",
-            call_type="direct",
-            line=20,
-        ))
+
+        sample_graph.add_edge(
+            CallEdge(
+                caller="caller.py:10",
+                callee="target.py:5",
+                call_type="direct",
+                line=10,
+            )
+        )
+        sample_graph.add_edge(
+            CallEdge(
+                caller="caller.py:20",
+                callee="target.py:5",
+                call_type="direct",
+                line=20,
+            )
+        )
 
         resolver = CrossRefResolver(sample_graph)
         callers = resolver.get_callers("target.py:5")
@@ -323,18 +341,23 @@ class TestCrossRefResolver:
 
     def test_get_callees(self, sample_graph: CodeGraph) -> None:
         from codegraph.graph import CallEdge
-        sample_graph.add_edge(CallEdge(
-            caller="caller.py:5",
-            callee="callee1.py:10",
-            call_type="direct",
-            line=5,
-        ))
-        sample_graph.add_edge(CallEdge(
-            caller="caller.py:5",
-            callee="callee2.py:20",
-            call_type="direct",
-            line=5,
-        ))
+
+        sample_graph.add_edge(
+            CallEdge(
+                caller="caller.py:5",
+                callee="callee1.py:10",
+                call_type="direct",
+                line=5,
+            )
+        )
+        sample_graph.add_edge(
+            CallEdge(
+                caller="caller.py:5",
+                callee="callee2.py:20",
+                call_type="direct",
+                line=5,
+            )
+        )
 
         resolver = CrossRefResolver(sample_graph)
         callees = resolver.get_callees("caller.py:5")
@@ -342,22 +365,27 @@ class TestCrossRefResolver:
 
     def test_get_dependencies(self, sample_graph: CodeGraph) -> None:
         from codegraph.graph import ImportInfo
-        sample_graph.imports.append(ImportInfo(
-            source_file="main.py",
-            module="os",
-            names=["path"],
-            is_relative=False,
-            line=1,
-            kind="import",
-        ))
-        sample_graph.imports.append(ImportInfo(
-            source_file="main.py",
-            module="json",
-            names=["loads"],
-            is_relative=False,
-            line=2,
-            kind="import",
-        ))
+
+        sample_graph.imports.append(
+            ImportInfo(
+                source_file="main.py",
+                module="os",
+                names=["path"],
+                is_relative=False,
+                line=1,
+                kind="import",
+            )
+        )
+        sample_graph.imports.append(
+            ImportInfo(
+                source_file="main.py",
+                module="json",
+                names=["loads"],
+                is_relative=False,
+                line=2,
+                kind="import",
+            )
+        )
 
         resolver = CrossRefResolver(sample_graph)
         deps = resolver.get_dependencies("main.py")
@@ -366,22 +394,27 @@ class TestCrossRefResolver:
 
     def test_get_dependents(self, sample_graph: CodeGraph) -> None:
         from codegraph.graph import ImportInfo
-        sample_graph.imports.append(ImportInfo(
-            source_file="a.py",
-            module="shared.py",
-            names=["helper"],
-            is_relative=True,
-            line=1,
-            kind="from_import",
-        ))
-        sample_graph.imports.append(ImportInfo(
-            source_file="b.py",
-            module="shared.py",
-            names=["helper"],
-            is_relative=True,
-            line=1,
-            kind="from_import",
-        ))
+
+        sample_graph.imports.append(
+            ImportInfo(
+                source_file="a.py",
+                module="shared.py",
+                names=["helper"],
+                is_relative=True,
+                line=1,
+                kind="from_import",
+            )
+        )
+        sample_graph.imports.append(
+            ImportInfo(
+                source_file="b.py",
+                module="shared.py",
+                names=["helper"],
+                is_relative=True,
+                line=1,
+                kind="from_import",
+            )
+        )
 
         resolver = CrossRefResolver(sample_graph)
         dependents = resolver.get_dependents("shared.py")
@@ -391,6 +424,7 @@ class TestCrossRefResolver:
 
 # --- GraphQuery Tests ---
 
+
 @pytest.fixture
 def sample_graph() -> CodeGraph:
     return CodeGraph(root_path="/test")
@@ -398,15 +432,33 @@ def sample_graph() -> CodeGraph:
 
 class TestGraphQuery:
     def test_search_by_name(self, sample_graph: CodeGraph) -> None:
-        sample_graph.add_symbol(Symbol(
-            name="UserModel", kind="class", file="models.py", line=1, column=0,
-        ))
-        sample_graph.add_symbol(Symbol(
-            name="UserController", kind="class", file="controllers.py", line=5, column=0,
-        ))
-        sample_graph.add_symbol(Symbol(
-            name="helper", kind="function", file="utils.py", line=10, column=0,
-        ))
+        sample_graph.add_symbol(
+            Symbol(
+                name="UserModel",
+                kind="class",
+                file="models.py",
+                line=1,
+                column=0,
+            )
+        )
+        sample_graph.add_symbol(
+            Symbol(
+                name="UserController",
+                kind="class",
+                file="controllers.py",
+                line=5,
+                column=0,
+            )
+        )
+        sample_graph.add_symbol(
+            Symbol(
+                name="helper",
+                kind="function",
+                file="utils.py",
+                line=10,
+                column=0,
+            )
+        )
 
         query = GraphQuery(sample_graph)
         results = query.search("User")
@@ -416,12 +468,24 @@ class TestGraphQuery:
         assert "UserController" in names
 
     def test_search_with_kind_filter(self, sample_graph: CodeGraph) -> None:
-        sample_graph.add_symbol(Symbol(
-            name="UserModel", kind="class", file="models.py", line=1, column=0,
-        ))
-        sample_graph.add_symbol(Symbol(
-            name="UserService", kind="function", file="services.py", line=5, column=0,
-        ))
+        sample_graph.add_symbol(
+            Symbol(
+                name="UserModel",
+                kind="class",
+                file="models.py",
+                line=1,
+                column=0,
+            )
+        )
+        sample_graph.add_symbol(
+            Symbol(
+                name="UserService",
+                kind="function",
+                file="services.py",
+                line=5,
+                column=0,
+            )
+        )
 
         query = GraphQuery(sample_graph)
         results = query.search("User", kind="class")
@@ -429,10 +493,16 @@ class TestGraphQuery:
         assert results[0]["name"] == "UserModel"
 
     def test_search_by_docstring(self, sample_graph: CodeGraph) -> None:
-        sample_graph.add_symbol(Symbol(
-            name="getUser", kind="function", file="api.py", line=1, column=0,
-            docstring="Get a user by ID",
-        ))
+        sample_graph.add_symbol(
+            Symbol(
+                name="getUser",
+                kind="function",
+                file="api.py",
+                line=1,
+                column=0,
+                docstring="Get a user by ID",
+            )
+        )
 
         query = GraphQuery(sample_graph)
         results = query.search("user by ID")
@@ -440,11 +510,17 @@ class TestGraphQuery:
         assert results[0]["name"] == "getUser"
 
     def test_get_symbol(self, sample_graph: CodeGraph) -> None:
-        sample_graph.add_symbol(Symbol(
-            name="foo", kind="function", file="test.py", line=42, column=0,
-            signature="def foo(x: int) -> str",
-            docstring="A test function",
-        ))
+        sample_graph.add_symbol(
+            Symbol(
+                name="foo",
+                kind="function",
+                file="test.py",
+                line=42,
+                column=0,
+                signature="def foo(x: int) -> str",
+                docstring="A test function",
+            )
+        )
 
         query = GraphQuery(sample_graph)
         result = query.get_symbol("test.py", 42)
@@ -458,15 +534,33 @@ class TestGraphQuery:
         assert result is None
 
     def test_get_functions(self, sample_graph: CodeGraph) -> None:
-        sample_graph.add_symbol(Symbol(
-            name="foo", kind="function", file="a.py", line=1, column=0,
-        ))
-        sample_graph.add_symbol(Symbol(
-            name="bar", kind="function", file="b.py", line=1, column=0,
-        ))
-        sample_graph.add_symbol(Symbol(
-            name="baz", kind="method", file="a.py", line=10, column=4,
-        ))
+        sample_graph.add_symbol(
+            Symbol(
+                name="foo",
+                kind="function",
+                file="a.py",
+                line=1,
+                column=0,
+            )
+        )
+        sample_graph.add_symbol(
+            Symbol(
+                name="bar",
+                kind="function",
+                file="b.py",
+                line=1,
+                column=0,
+            )
+        )
+        sample_graph.add_symbol(
+            Symbol(
+                name="baz",
+                kind="method",
+                file="a.py",
+                line=10,
+                column=4,
+            )
+        )
 
         query = GraphQuery(sample_graph)
         all_funcs = query.get_functions()
@@ -476,12 +570,24 @@ class TestGraphQuery:
         assert len(a_funcs) == 2
 
     def test_get_classes(self, sample_graph: CodeGraph) -> None:
-        sample_graph.add_symbol(Symbol(
-            name="MyClass", kind="class", file="a.py", line=1, column=0,
-        ))
-        sample_graph.add_symbol(Symbol(
-            name="OtherClass", kind="class", file="b.py", line=5, column=0,
-        ))
+        sample_graph.add_symbol(
+            Symbol(
+                name="MyClass",
+                kind="class",
+                file="a.py",
+                line=1,
+                column=0,
+            )
+        )
+        sample_graph.add_symbol(
+            Symbol(
+                name="OtherClass",
+                kind="class",
+                file="b.py",
+                line=5,
+                column=0,
+            )
+        )
 
         query = GraphQuery(sample_graph)
         classes = query.get_classes()
@@ -491,14 +597,17 @@ class TestGraphQuery:
 
     def test_get_imports(self, sample_graph: CodeGraph) -> None:
         from codegraph.graph import ImportInfo
-        sample_graph.imports.append(ImportInfo(
-            source_file="main.py",
-            module="os",
-            names=["path"],
-            is_relative=False,
-            line=1,
-            kind="import",
-        ))
+
+        sample_graph.imports.append(
+            ImportInfo(
+                source_file="main.py",
+                module="os",
+                names=["path"],
+                is_relative=False,
+                line=1,
+                kind="import",
+            )
+        )
 
         query = GraphQuery(sample_graph)
         imports = query.get_imports("main.py")
@@ -507,12 +616,15 @@ class TestGraphQuery:
 
     def test_get_call_graph(self, sample_graph: CodeGraph) -> None:
         from codegraph.graph import CallEdge
-        sample_graph.add_edge(CallEdge(
-            caller="main.py:10",
-            callee="helper.py:5",
-            call_type="direct",
-            line=10,
-        ))
+
+        sample_graph.add_edge(
+            CallEdge(
+                caller="main.py:10",
+                callee="helper.py:5",
+                call_type="direct",
+                line=10,
+            )
+        )
 
         query = GraphQuery(sample_graph)
         graph = query.get_call_graph("main.py:10")
@@ -521,12 +633,24 @@ class TestGraphQuery:
         assert graph["callees"][0]["callee"] == "helper.py:5"
 
     def test_get_summary(self, sample_graph: CodeGraph) -> None:
-        sample_graph.add_symbol(Symbol(
-            name="foo", kind="function", file="a.py", line=1, column=0,
-        ))
-        sample_graph.add_symbol(Symbol(
-            name="Bar", kind="class", file="b.py", line=5, column=0,
-        ))
+        sample_graph.add_symbol(
+            Symbol(
+                name="foo",
+                kind="function",
+                file="a.py",
+                line=1,
+                column=0,
+            )
+        )
+        sample_graph.add_symbol(
+            Symbol(
+                name="Bar",
+                kind="class",
+                file="b.py",
+                line=5,
+                column=0,
+            )
+        )
 
         query = GraphQuery(sample_graph)
         summary = query.get_summary()

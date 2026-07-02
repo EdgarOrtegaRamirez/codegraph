@@ -60,6 +60,7 @@ def sample_graph() -> CodeGraph:
 
 # --- Test file discovery ---
 
+
 class TestDiscoverFiles:
     def test_discovers_py_files(self, tmp_path: Path) -> None:
         (tmp_path / "a.py").write_text("# a")
@@ -89,6 +90,7 @@ class TestDiscoverFiles:
 
 # --- Test language detection ---
 
+
 class TestDetectLanguage:
     def test_python(self) -> None:
         assert detect_language(Path("foo.py")) == "python"
@@ -102,6 +104,7 @@ class TestDetectLanguage:
 
 
 # --- Test Python parser ---
+
 
 class TestPythonParser:
     def test_parses_functions(self, sample_file: Path, sample_graph: CodeGraph) -> None:
@@ -140,7 +143,9 @@ class TestPythonParser:
         assert "os" in modules
         assert "typing" in modules
 
-    def test_parses_signatures(self, sample_file: Path, sample_graph: CodeGraph) -> None:
+    def test_parses_signatures(
+        self, sample_file: Path, sample_graph: CodeGraph
+    ) -> None:
         parser = PythonParser(sample_file.parent)
         parser.parse_file(sample_file, sample_graph)
 
@@ -149,7 +154,9 @@ class TestPythonParser:
         assert "y: int" in func.signature
         assert "-> int" in func.signature
 
-    def test_parses_docstrings(self, sample_file: Path, sample_graph: CodeGraph) -> None:
+    def test_parses_docstrings(
+        self, sample_file: Path, sample_graph: CodeGraph
+    ) -> None:
         parser = PythonParser(sample_file.parent)
         parser.parse_file(sample_file, sample_graph)
 
@@ -160,27 +167,38 @@ class TestPythonParser:
         parser = PythonParser(sample_file.parent)
         parser.parse_file(sample_file, sample_graph)
 
-        async_func = next(s for s in sample_graph.symbols.values() if s.name == "async_func")
+        async_func = next(
+            s for s in sample_graph.symbols.values() if s.name == "async_func"
+        )
         assert async_func.is_async
 
-    def test_detects_access_level(self, sample_file: Path, sample_graph: CodeGraph) -> None:
+    def test_detects_access_level(
+        self, sample_file: Path, sample_graph: CodeGraph
+    ) -> None:
         parser = PythonParser(sample_file.parent)
         parser.parse_file(sample_file, sample_graph)
 
         # _private should be detected
         assert any(s.name.startswith("_") for s in sample_graph.symbols.values())
         # __init__ is a dunder, so public
-        init = next((s for s in sample_graph.symbols.values() if s.name == "__init__"), None)
+        init = next(
+            (s for s in sample_graph.symbols.values() if s.name == "__init__"), None
+        )
         assert init is not None
         assert init.access == "public"  # dunders are public
 
 
 # --- Test graph serialization ---
 
+
 class TestGraphSerialization:
     def test_to_dict(self, sample_graph: CodeGraph) -> None:
         sym = Symbol(
-            name="foo", kind="function", file="test.py", line=1, column=0,
+            name="foo",
+            kind="function",
+            file="test.py",
+            line=1,
+            column=0,
             signature="def foo() -> None",
         )
         sample_graph.add_symbol(sym)
@@ -206,6 +224,7 @@ class TestGraphSerialization:
 
 
 # --- Test output formatters ---
+
 
 class TestOutputFormatters:
     def test_format_markdown(self, sample_graph: CodeGraph) -> None:

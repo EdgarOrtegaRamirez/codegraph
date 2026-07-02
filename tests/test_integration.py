@@ -53,7 +53,7 @@ def format_data(data: dict) -> str:
     """Format data as JSON string."""
     return json.dumps(data)
 ''',
-    "app.js": '''
+    "app.js": """
 /**
  * Express application entry point.
  */
@@ -83,8 +83,8 @@ async function main() {
 export const helper = (x) => x + 1;
 
 export default main;
-''',
-    "main.go": '''
+""",
+    "main.go": """
 package main
 
 import (
@@ -116,8 +116,8 @@ func main() {
     fmt.Println("Starting...")
     http.ListenAndServe(fmt.Sprintf(":%d", config.Port), handler)
 }
-''',
-    "lib.rs": '''
+""",
+    "lib.rs": """
 use std::collections::HashMap;
 
 /// Main application struct
@@ -142,7 +142,7 @@ fn main() {
     let app = App::new("MyApp");
     app.run();
 }
-''',
+""",
 }
 
 
@@ -155,6 +155,7 @@ def multi_lang_project(tmp_path: Path) -> Path:
 
 
 # --- Multi-language integration tests ---
+
 
 class TestMultiLanguageIntegration:
     """Test that the indexer correctly handles multi-language projects."""
@@ -225,7 +226,7 @@ class TestMultiLanguageIntegration:
 
 # --- Rust parser tests ---
 
-SAMPLE_RUST = '''
+SAMPLE_RUST = """
 use std::collections::HashMap;
 
 /// A user struct
@@ -262,7 +263,7 @@ fn main() {
     let user = User::new(1, "Alice");
     println!("{}", user.name());
 }
-'''
+"""
 
 
 class TestRustParser:
@@ -330,11 +331,12 @@ class TestRustParser:
 
 # --- Incremental indexing tests ---
 
+
 class TestIncrementalIndexing:
     def test_full_index(self, tmp_path: Path) -> None:
         """Test that full indexing works."""
         (tmp_path / "test.py").write_text(
-            'def foo():\n    pass\n\nclass Bar:\n    pass\n'
+            "def foo():\n    pass\n\nclass Bar:\n    pass\n"
         )
 
         indexer = IncrementalIndexer(tmp_path)
@@ -345,7 +347,7 @@ class TestIncrementalIndexing:
 
     def test_cache_persists(self, tmp_path: Path) -> None:
         """Test that cache is created and persisted."""
-        (tmp_path / "test.py").write_text('def foo():\n    pass\n')
+        (tmp_path / "test.py").write_text("def foo():\n    pass\n")
 
         cache_dir = tmp_path / ".cache"
         indexer = IncrementalIndexer(tmp_path, cache_dir=cache_dir)
@@ -355,7 +357,7 @@ class TestIncrementalIndexing:
 
     def test_unchanged_files_skipped(self, tmp_path: Path) -> None:
         """Test that unchanged files are skipped on second run."""
-        (tmp_path / "test.py").write_text('def foo():\n    pass\n')
+        (tmp_path / "test.py").write_text("def foo():\n    pass\n")
 
         cache_dir = tmp_path / ".cache"
         indexer = IncrementalIndexer(tmp_path, cache_dir=cache_dir)
@@ -369,7 +371,7 @@ class TestIncrementalIndexing:
 
     def test_changed_file_reindexed(self, tmp_path: Path) -> None:
         """Test that changed files are re-indexed."""
-        (tmp_path / "test.py").write_text('def foo():\n    pass\n')
+        (tmp_path / "test.py").write_text("def foo():\n    pass\n")
 
         cache_dir = tmp_path / ".cache"
         indexer = IncrementalIndexer(tmp_path, cache_dir=cache_dir)
@@ -377,8 +379,11 @@ class TestIncrementalIndexing:
 
         # Modify the file
         import time
+
         time.sleep(0.1)
-        (tmp_path / "test.py").write_text('def foo():\n    pass\n\ndef bar():\n    pass\n')
+        (tmp_path / "test.py").write_text(
+            "def foo():\n    pass\n\ndef bar():\n    pass\n"
+        )
 
         indexer2 = IncrementalIndexer(tmp_path, cache_dir=cache_dir)
         graph = indexer2.index()
@@ -388,7 +393,7 @@ class TestIncrementalIndexing:
 
     def test_clear_cache(self, tmp_path: Path) -> None:
         """Test that cache can be cleared."""
-        (tmp_path / "test.py").write_text('def foo():\n    pass\n')
+        (tmp_path / "test.py").write_text("def foo():\n    pass\n")
 
         cache_dir = tmp_path / ".cache"
         indexer = IncrementalIndexer(tmp_path, cache_dir=cache_dir)
@@ -424,15 +429,25 @@ class TestIncrementalIndexing:
 
 # --- CLI integration tests ---
 
+
 class TestCLIIntegration:
     def test_index_command(self, multi_lang_project: Path, tmp_path: Path) -> None:
         """Test the CLI index command produces valid JSON."""
         output_file = tmp_path / "output.json"
         import subprocess
+
         result = subprocess.run(
-            ["python", "-m", "codegraph", "index", str(multi_lang_project),
-             "--output", str(output_file)],
-            capture_output=True, text=True,
+            [
+                "python",
+                "-m",
+                "codegraph",
+                "index",
+                str(multi_lang_project),
+                "--output",
+                str(output_file),
+            ],
+            capture_output=True,
+            text=True,
         )
         assert result.returncode == 0
         data = json.loads(output_file.read_text())
@@ -444,9 +459,19 @@ class TestCLIIntegration:
         """Test the CLI query command with search."""
         output_file = tmp_path / "query.json"
         result = subprocess.run(
-            ["python", "-m", "codegraph", "query", str(multi_lang_project),
-             "--search", "User", "--output", str(output_file)],
-            capture_output=True, text=True,
+            [
+                "python",
+                "-m",
+                "codegraph",
+                "query",
+                str(multi_lang_project),
+                "--search",
+                "User",
+                "--output",
+                str(output_file),
+            ],
+            capture_output=True,
+            text=True,
         )
         assert result.returncode == 0
         data = json.loads(output_file.read_text())
@@ -459,9 +484,18 @@ class TestCLIIntegration:
         """Test the CLI query --functions command."""
         output_file = tmp_path / "funcs.json"
         result = subprocess.run(
-            ["python", "-m", "codegraph", "query", str(multi_lang_project),
-             "--functions", "--output", str(output_file)],
-            capture_output=True, text=True,
+            [
+                "python",
+                "-m",
+                "codegraph",
+                "query",
+                str(multi_lang_project),
+                "--functions",
+                "--output",
+                str(output_file),
+            ],
+            capture_output=True,
+            text=True,
         )
         assert result.returncode == 0
         data = json.loads(output_file.read_text())
@@ -472,9 +506,18 @@ class TestCLIIntegration:
         """Test the CLI query --classes command."""
         output_file = tmp_path / "classes.json"
         result = subprocess.run(
-            ["python", "-m", "codegraph", "query", str(multi_lang_project),
-             "--classes", "--output", str(output_file)],
-            capture_output=True, text=True,
+            [
+                "python",
+                "-m",
+                "codegraph",
+                "query",
+                str(multi_lang_project),
+                "--classes",
+                "--output",
+                str(output_file),
+            ],
+            capture_output=True,
+            text=True,
         )
         assert result.returncode == 0
         data = json.loads(output_file.read_text())
@@ -484,9 +527,17 @@ class TestCLIIntegration:
     def test_stats_format(self, multi_lang_project: Path) -> None:
         """Test the CLI index --stats command."""
         result = subprocess.run(
-            ["python", "-m", "codegraph", "index", str(multi_lang_project),
-             "--format", "stats"],
-            capture_output=True, text=True,
+            [
+                "python",
+                "-m",
+                "codegraph",
+                "index",
+                str(multi_lang_project),
+                "--format",
+                "stats",
+            ],
+            capture_output=True,
+            text=True,
         )
         assert result.returncode == 0
         assert "Total symbols:" in result.stdout
@@ -495,21 +546,41 @@ class TestCLIIntegration:
     def test_markdown_format(self, multi_lang_project: Path) -> None:
         """Test the CLI index --format markdown command."""
         result = subprocess.run(
-            ["python", "-m", "codegraph", "index", str(multi_lang_project),
-             "--format", "markdown"],
-            capture_output=True, text=True,
+            [
+                "python",
+                "-m",
+                "codegraph",
+                "index",
+                str(multi_lang_project),
+                "--format",
+                "markdown",
+            ],
+            capture_output=True,
+            text=True,
         )
         assert result.returncode == 0
         assert "# CodeGraph Analysis" in result.stdout
 
-    def test_incremental_index_cli(self, multi_lang_project: Path, tmp_path: Path) -> None:
+    def test_incremental_index_cli(
+        self, multi_lang_project: Path, tmp_path: Path
+    ) -> None:
         """Test the CLI --cache flag."""
         cache_dir = tmp_path / ".codegraph-cache"
         output_file = tmp_path / "output.json"
         result = subprocess.run(
-            ["python", "-m", "codegraph", "index", str(multi_lang_project),
-             "--cache", str(cache_dir), "--output", str(output_file)],
-            capture_output=True, text=True,
+            [
+                "python",
+                "-m",
+                "codegraph",
+                "index",
+                str(multi_lang_project),
+                "--cache",
+                str(cache_dir),
+                "--output",
+                str(output_file),
+            ],
+            capture_output=True,
+            text=True,
         )
         assert result.returncode == 0
         assert "Delta index:" in result.stderr or "files to index" in result.stderr

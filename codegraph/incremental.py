@@ -46,9 +46,7 @@ class CacheManager:
     def save(self, data: dict[str, Any]) -> None:
         """Save the cache to disk."""
         data["updated_at"] = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
-        self.cache_file.write_text(
-            json.dumps(data, indent=2), encoding="utf-8"
-        )
+        self.cache_file.write_text(json.dumps(data, indent=2), encoding="utf-8")
 
     def get_file_mtime(self, filepath: str) -> float | None:
         """Get the cached mtime for a file, or None if not cached."""
@@ -183,15 +181,16 @@ class IncrementalIndexer:
                 print(f"  Warning: Failed to parse {filepath}: {e}", file=sys.stderr)
 
         # Finalize summary
-        graph.summary.total_files = len(set(
-            s.file for s in graph.symbols.values()
-        ))
+        graph.summary.total_files = len(set(s.file for s in graph.symbols.values()))
         graph.summary.total_symbols = len(graph.symbols)
         graph.summary.total_imports = len(graph.imports)
         graph.summary.total_edges = len(graph.edges)
 
         elapsed = time.time() - start
-        print(f"Indexed {graph.summary.total_symbols} symbols in {elapsed:.2f}s", file=sys.stderr)
+        print(
+            f"Indexed {graph.summary.total_symbols} symbols in {elapsed:.2f}s",
+            file=sys.stderr,
+        )
         print(f"  Functions: {graph.summary.total_functions}", file=sys.stderr)
         print(f"  Classes: {graph.summary.total_classes}", file=sys.stderr)
         print(f"  Imports: {graph.summary.total_imports}", file=sys.stderr)

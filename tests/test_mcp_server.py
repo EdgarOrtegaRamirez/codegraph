@@ -43,10 +43,7 @@ class TestCodeGraphMCP:
         server = CodeGraphServer()
         # The list_tools decorator registers handlers
         # Check that the request handler for ListToolsRequest exists
-        assert (
-            type.__bases__
-            for type in server.server.request_handlers
-        )
+        assert (type.__bases__ for type in server.server.request_handlers)
         # Just verify the server was created without error
         assert server is not None
 
@@ -62,10 +59,12 @@ class TestCodeGraphMCP:
     def test_search_tool(self, code_project: Path) -> None:
         """Test the codegraph_search tool."""
         server = CodeGraphServer()
-        result = server._handle_search({
-            "path": str(code_project),
-            "query": "hello",
-        })
+        result = server._handle_search(
+            {
+                "path": str(code_project),
+                "query": "hello",
+            }
+        )
         assert len(result) == 1
         assert result[0].type == "text"
         assert "hello" in result[0].text.lower() or "Hello" in result[0].text
@@ -73,22 +72,26 @@ class TestCodeGraphMCP:
     def test_search_with_kind_filter(self, code_project: Path) -> None:
         """Test search with kind filter."""
         server = CodeGraphServer()
-        result = server._handle_search({
-            "path": str(code_project),
-            "query": "Greeter",
-            "kind": "class",
-        })
+        result = server._handle_search(
+            {
+                "path": str(code_project),
+                "query": "Greeter",
+                "kind": "class",
+            }
+        )
         assert len(result) == 1
         assert "Greeter" in result[0].text
 
     def test_get_symbol_tool(self, code_project: Path) -> None:
         """Test getting a specific symbol."""
         server = CodeGraphServer()
-        result = server._handle_get_symbol({
-            "path": str(code_project),
-            "file": "app.py",
-            "line": 2,  # hello function is at line 2
-        })
+        result = server._handle_get_symbol(
+            {
+                "path": str(code_project),
+                "file": "app.py",
+                "line": 2,  # hello function is at line 2
+            }
+        )
         assert len(result) == 1
         assert result[0].type == "text"
         assert "hello" in result[0].text.lower()
@@ -96,19 +99,23 @@ class TestCodeGraphMCP:
     def test_get_symbol_not_found(self, code_project: Path) -> None:
         """Test getting a non-existent symbol."""
         server = CodeGraphServer()
-        result = server._handle_get_symbol({
-            "path": str(code_project),
-            "file": "app.py",
-            "line": 999,
-        })
+        result = server._handle_get_symbol(
+            {
+                "path": str(code_project),
+                "file": "app.py",
+                "line": 999,
+            }
+        )
         assert "No symbol found" in result[0].text
 
     def test_get_functions_tool(self, code_project: Path) -> None:
         """Test listing all functions."""
         server = CodeGraphServer()
-        result = server._handle_get_functions({
-            "path": str(code_project),
-        })
+        result = server._handle_get_functions(
+            {
+                "path": str(code_project),
+            }
+        )
         assert len(result) == 1
         assert "Found" in result[0].text
         assert "functions" in result[0].text.lower()
@@ -116,19 +123,23 @@ class TestCodeGraphMCP:
     def test_get_classes_tool(self, code_project: Path) -> None:
         """Test listing all classes."""
         server = CodeGraphServer()
-        result = server._handle_get_classes({
-            "path": str(code_project),
-        })
+        result = server._handle_get_classes(
+            {
+                "path": str(code_project),
+            }
+        )
         assert len(result) == 1
         assert "Greeter" in result[0].text
 
     def test_get_imports_tool(self, code_project: Path) -> None:
         """Test getting imports for a file."""
         server = CodeGraphServer()
-        result = server._handle_get_imports({
-            "path": str(code_project),
-            "file": "app.py",
-        })
+        result = server._handle_get_imports(
+            {
+                "path": str(code_project),
+                "file": "app.py",
+            }
+        )
         assert len(result) == 1
         # File has no imports, should show "No imports"
         assert "No imports" in result[0].text
@@ -136,29 +147,35 @@ class TestCodeGraphMCP:
     def test_get_call_graph_tool(self, code_project: Path) -> None:
         """Test getting call graph."""
         server = CodeGraphServer()
-        result = server._handle_get_call_graph({
-            "path": str(code_project),
-            "symbol_key": "app.py:15",  # main function
-        })
+        result = server._handle_get_call_graph(
+            {
+                "path": str(code_project),
+                "symbol_key": "app.py:15",  # main function
+            }
+        )
         assert len(result) == 1
         assert "app.py:15" in result[0].text
 
     def test_get_dependencies_tool(self, code_project: Path) -> None:
         """Test getting file dependencies."""
         server = CodeGraphServer()
-        result = server._handle_get_dependencies({
-            "path": str(code_project),
-            "file": "app.py",
-        })
+        result = server._handle_get_dependencies(
+            {
+                "path": str(code_project),
+                "file": "app.py",
+            }
+        )
         assert len(result) == 1
         assert "Dependencies" in result[0].text
 
     def test_summary_tool(self, code_project: Path) -> None:
         """Test getting codebase summary."""
         server = CodeGraphServer()
-        result = server._handle_summary({
-            "path": str(code_project),
-        })
+        result = server._handle_summary(
+            {
+                "path": str(code_project),
+            }
+        )
         assert len(result) == 1
         assert "summary" in result[0].text.lower()
         assert "total_symbols" in result[0].text
@@ -166,9 +183,11 @@ class TestCodeGraphMCP:
     def test_markdown_report_tool(self, code_project: Path) -> None:
         """Test generating markdown report."""
         server = CodeGraphServer()
-        result = server._handle_markdown_report({
-            "path": str(code_project),
-        })
+        result = server._handle_markdown_report(
+            {
+                "path": str(code_project),
+            }
+        )
         assert len(result) == 1
         assert "# CodeGraph Analysis" in result[0].text
 
@@ -176,10 +195,12 @@ class TestCodeGraphMCP:
         """Test incremental indexing via MCP tool."""
         cache_dir = code_project / ".cache"
         server = CodeGraphServer(cache_dir=str(cache_dir))
-        result = server._handle_index({
-            "path": str(code_project),
-            "incremental": True,
-        })
+        result = server._handle_index(
+            {
+                "path": str(code_project),
+                "incremental": True,
+            }
+        )
         assert len(result) == 1
         assert "Indexed" in result[0].text
 

@@ -70,7 +70,9 @@ def format_markdown(graph: CodeGraph) -> str:
             if imp.kind == "import":
                 lines.append(f"- `{imp.source_file}:{imp.line}`: `import {imp.module}`")
             else:
-                lines.append(f"- `{imp.source_file}:{imp.line}`: `from {imp.module} import {names}`")
+                lines.append(
+                    f"- `{imp.source_file}:{imp.line}`: `from {imp.module} import {names}`"
+                )
         lines.append("")
 
     # Call edges

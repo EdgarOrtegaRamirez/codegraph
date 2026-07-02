@@ -62,9 +62,7 @@ class Indexer:
                 print(f"  Warning: Failed to parse {filepath}: {e}")
 
         # Finalize summary
-        graph.summary.total_files = len(set(
-            s.file for s in graph.symbols.values()
-        ))
+        graph.summary.total_files = len(set(s.file for s in graph.symbols.values()))
         graph.summary.total_symbols = len(graph.symbols)
         graph.summary.total_imports = len(graph.imports)
         graph.summary.total_edges = len(graph.edges)

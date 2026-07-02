@@ -17,6 +17,7 @@ from codegraph.utils import rel_path
 @dataclass
 class _Scope:
     """Tracks the current nesting scope for parent resolution."""
+
     name: str
     kind: str  # module, class, function
     parents: list[str] = field(default_factory=list)
@@ -76,15 +77,17 @@ class _PythonSymbolCollector(ast.NodeVisitor):
     def visit_Module(self, node: ast.Module) -> None:
         docstring = ast.get_docstring(node) or ""
         if docstring:
-            self.graph.add_symbol(Symbol(
-                name=Path(self.rel).stem,
-                kind="module",
-                file=self.rel,
-                line=1,
-                column=0,
-                docstring=docstring,
-                lines_spanned=1,
-            ))
+            self.graph.add_symbol(
+                Symbol(
+                    name=Path(self.rel).stem,
+                    kind="module",
+                    file=self.rel,
+                    line=1,
+                    column=0,
+                    docstring=docstring,
+                    lines_spanned=1,
+                )
+            )
         self.generic_visit(node)
 
     # --- Classes ---
@@ -106,18 +109,20 @@ class _PythonSymbolCollector(ast.NodeVisitor):
         docstring = ast.get_docstring(node) or ""
         end_line = getattr(node, "end_lineno", node.lineno) or node.lineno
 
-        self.graph.add_symbol(Symbol(
-            name=node.name,
-            kind="class",
-            file=self.rel,
-            line=node.lineno,
-            column=getattr(node, "col_offset", 0),
-            signature=sig,
-            docstring=docstring,
-            access="public" if not node.name.startswith("_") else "private",
-            parents=parents,
-            lines_spanned=end_line - node.lineno + 1,
-        ))
+        self.graph.add_symbol(
+            Symbol(
+                name=node.name,
+                kind="class",
+                file=self.rel,
+                line=node.lineno,
+                column=getattr(node, "col_offset", 0),
+                signature=sig,
+                docstring=docstring,
+                access="public" if not node.name.startswith("_") else "private",
+                parents=parents,
+                lines_spanned=end_line - node.lineno + 1,
+            )
+        )
 
         # Push class scope before visiting children
         self.scope_stack.append(_Scope(node.name, "class", parents))
@@ -147,8 +152,7 @@ class _PythonSymbolCollector(ast.NodeVisitor):
             for d in node.decorator_list
         )
         is_property = any(
-            isinstance(d, ast.Name) and d.id == "property"
-            for d in node.decorator_list
+            isinstance(d, ast.Name) and d.id == "property" for d in node.decorator_list
         )
 
         # Determine access
@@ -174,24 +178,26 @@ class _PythonSymbolCollector(ast.NodeVisitor):
 
         end_line = getattr(node, "end_lineno", node.lineno) or node.lineno
 
-        self.graph.add_symbol(Symbol(
-            name=node.name,
-            kind="method" if is_method else "function",
-            file=self.rel,
-            line=node.lineno,
-            column=getattr(node, "col_offset", 0),
-            signature=sig,
-            docstring=docstring,
-            access=access,
-            decorators=decorators,
-            parents=parents,
-            parameters=params,
-            return_type=ret_type,
-            is_async=is_async,
-            is_static=is_static,
-            is_property=is_property,
-            lines_spanned=end_line - node.lineno + 1,
-        ))
+        self.graph.add_symbol(
+            Symbol(
+                name=node.name,
+                kind="method" if is_method else "function",
+                file=self.rel,
+                line=node.lineno,
+                column=getattr(node, "col_offset", 0),
+                signature=sig,
+                docstring=docstring,
+                access=access,
+                decorators=decorators,
+                parents=parents,
+                parameters=params,
+                return_type=ret_type,
+                is_async=is_async,
+                is_static=is_static,
+                is_property=is_property,
+                lines_spanned=end_line - node.lineno + 1,
+            )
+        )
 
         # Push function scope before visiting children
         self.scope_stack.append(_Scope(node.name, "function", parents))
@@ -201,15 +207,17 @@ class _PythonSymbolCollector(ast.NodeVisitor):
     # --- Imports ---
     def visit_Import(self, node: ast.Import) -> None:
         for alias in node.names:
-            self.graph.imports.append(ImportInfo(
-                source_file=self.rel,
-                module=alias.name,
-                names=[alias.asname or alias.name],
-                alias={alias.name: alias.asname} if alias.asname else {},
-                is_relative=False,
-                line=node.lineno,
-                kind="import",
-            ))
+            self.graph.imports.append(
+                ImportInfo(
+                    source_file=self.rel,
+                    module=alias.name,
+                    names=[alias.asname or alias.name],
+                    alias={alias.name: alias.asname} if alias.asname else {},
+                    is_relative=False,
+                    line=node.lineno,
+                    kind="import",
+                )
+            )
         self.generic_visit(node)
 
     def visit_ImportFrom(self, node: ast.ImportFrom) -> None:
@@ -221,15 +229,17 @@ class _PythonSymbolCollector(ast.NodeVisitor):
             if alias_node.asname:
                 alias[alias_node.name] = alias_node.asname
 
-        self.graph.imports.append(ImportInfo(
-            source_file=self.rel,
-            module=module,
-            names=names,
-            alias=alias,
-            is_relative=node.level > 0,
-            line=node.lineno,
-            kind="from_import",
-        ))
+        self.graph.imports.append(
+            ImportInfo(
+                source_file=self.rel,
+                module=module,
+                names=names,
+                alias=alias,
+                is_relative=node.level > 0,
+                line=node.lineno,
+                kind="from_import",
+            )
+        )
         self.generic_visit(node)
 
     # --- Call edges ---
@@ -237,12 +247,14 @@ class _PythonSymbolCollector(ast.NodeVisitor):
         caller_key = f"{self.rel}:{getattr(node, 'lineno', 0)}"
         callee_str = self._resolve_call_target(node.func)
         if callee_str:
-            self.graph.add_edge(CallEdge(
-                caller=caller_key,
-                callee=callee_str,
-                call_type="direct",
-                line=getattr(node, "lineno", 0),
-            ))
+            self.graph.add_edge(
+                CallEdge(
+                    caller=caller_key,
+                    callee=callee_str,
+                    call_type="direct",
+                    line=getattr(node, "lineno", 0),
+                )
+            )
         self.generic_visit(node)
 
     # --- Variables (assignments) ---
@@ -252,25 +264,29 @@ class _PythonSymbolCollector(ast.NodeVisitor):
                 doc = ""
                 if isinstance(node.value, ast.Expr):
                     doc = ast.get_docstring(node.value) or ""
-                self.graph.add_symbol(Symbol(
-                    name=target.id,
-                    kind="variable",
-                    file=self.rel,
-                    line=node.lineno,
-                    column=getattr(node, "col_offset", 0),
-                    docstring=doc,
-                ))
+                self.graph.add_symbol(
+                    Symbol(
+                        name=target.id,
+                        kind="variable",
+                        file=self.rel,
+                        line=node.lineno,
+                        column=getattr(node, "col_offset", 0),
+                        docstring=doc,
+                    )
+                )
         self.generic_visit(node)
 
     def visit_AnnAssign(self, node: ast.AnnAssign) -> None:
         if isinstance(node.target, ast.Name):
-            self.graph.add_symbol(Symbol(
-                name=node.target.id,
-                kind="variable",
-                file=self.rel,
-                line=node.lineno,
-                column=getattr(node, "col_offset", 0),
-            ))
+            self.graph.add_symbol(
+                Symbol(
+                    name=node.target.id,
+                    kind="variable",
+                    file=self.rel,
+                    line=node.lineno,
+                    column=getattr(node, "col_offset", 0),
+                )
+            )
         self.generic_visit(node)
 
     # --- Decorators ---
@@ -344,7 +360,9 @@ class _PythonSymbolCollector(ast.NodeVisitor):
             s += f": {ast.unparse(arg.annotation)}"
         return s
 
-    def _extract_params(self, node: ast.FunctionDef | ast.AsyncFunctionDef) -> list[str]:
+    def _extract_params(
+        self, node: ast.FunctionDef | ast.AsyncFunctionDef
+    ) -> list[str]:
         """Extract parameter names for the symbol."""
         params = []
         args = node.args

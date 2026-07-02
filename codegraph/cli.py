@@ -43,11 +43,13 @@ examples:
         help="Path to the codebase to index",
     )
     index_parser.add_argument(
-        "--output", "-o",
+        "--output",
+        "-o",
         help="Output file path (default: stdout)",
     )
     index_parser.add_argument(
-        "--format", "-f",
+        "--format",
+        "-f",
         choices=["json", "markdown", "stats"],
         default="json",
         help="Output format (default: json)",
@@ -76,24 +78,25 @@ examples:
     )
 
     # query subcommand
-    query_parser = subparsers.add_parser(
-        "query", help="Query the indexed codebase"
-    )
+    query_parser = subparsers.add_parser("query", help="Query the indexed codebase")
     query_parser.add_argument(
         "path",
         help="Path to the codebase to query",
     )
     query_parser.add_argument(
-        "--search", "-s",
+        "--search",
+        "-s",
         help="Search term (matches name and docstring)",
     )
     query_parser.add_argument(
-        "--kind", "-k",
+        "--kind",
+        "-k",
         choices=["function", "method", "class", "variable", "module"],
         help="Filter by symbol kind",
     )
     query_parser.add_argument(
-        "--file", "-f",
+        "--file",
+        "-f",
         help="Filter by file path",
     )
     query_parser.add_argument(
@@ -111,11 +114,13 @@ examples:
         help="List imports for a specific file",
     )
     query_parser.add_argument(
-        "--call-graph", "-c",
+        "--call-graph",
+        "-c",
         help="Show call graph for a symbol key (file:line)",
     )
     query_parser.add_argument(
-        "--output", "-o",
+        "--output",
+        "-o",
         help="Output file path (default: stdout)",
     )
 
@@ -132,7 +137,8 @@ examples:
         help="Show dependencies for a specific file",
     )
     resolve_parser.add_argument(
-        "--output", "-o",
+        "--output",
+        "-o",
         help="Output file path (default: stdout)",
     )
 
@@ -178,7 +184,9 @@ def cmd_index(args: argparse.Namespace) -> int:
     # Check for incremental indexing
     if args.cache:
         print(f"Indexing {target} (incremental)...", file=sys.stderr)
-        indexer = IncrementalIndexer(target, cache_dir=args.cache, extensions=extensions)
+        indexer = IncrementalIndexer(
+            target, cache_dir=args.cache, extensions=extensions
+        )
         if args.clear_cache:
             indexer.clear_cache()
     else:
@@ -189,7 +197,7 @@ def cmd_index(args: argparse.Namespace) -> int:
     graph = indexer.index()
 
     # Format output
-    if getattr(args, 'stats', False):
+    if getattr(args, "stats", False):
         output = format_stats(graph)
     elif args.format == "stats":
         output = format_stats(graph)

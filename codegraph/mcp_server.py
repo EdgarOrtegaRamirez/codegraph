@@ -153,9 +153,7 @@ class CodeGraphServer:
                             },
                             "file": {
                                 "type": "string",
-                                "description": (
-                                    "Optional file path to filter by."
-                                ),
+                                "description": ("Optional file path to filter by."),
                             },
                         },
                         "required": ["path"],
@@ -176,9 +174,7 @@ class CodeGraphServer:
                             },
                             "file": {
                                 "type": "string",
-                                "description": (
-                                    "Optional file path to filter by."
-                                ),
+                                "description": ("Optional file path to filter by."),
                             },
                         },
                         "required": ["path"],
@@ -199,9 +195,7 @@ class CodeGraphServer:
                             },
                             "file": {
                                 "type": "string",
-                                "description": (
-                                    "Relative file path to query."
-                                ),
+                                "description": ("Relative file path to query."),
                             },
                         },
                         "required": ["path", "file"],
@@ -232,8 +226,7 @@ class CodeGraphServer:
                             "depth": {
                                 "type": "integer",
                                 "description": (
-                                    "How many levels deep to traverse "
-                                    "(default: 2)."
+                                    "How many levels deep to traverse (default: 2)."
                                 ),
                                 "default": 2,
                             },
@@ -257,9 +250,7 @@ class CodeGraphServer:
                             },
                             "file": {
                                 "type": "string",
-                                "description": (
-                                    "Relative file path to analyze."
-                                ),
+                                "description": ("Relative file path to analyze."),
                             },
                         },
                         "required": ["path", "file"],
@@ -328,9 +319,7 @@ class CodeGraphServer:
                 raise ValueError(f"Unknown tool: {name}")
             return handler(arguments)
 
-    def _load_graph(
-        self, path: str | Path
-    ) -> tuple[GraphQuery, Indexer]:
+    def _load_graph(self, path: str | Path) -> tuple[GraphQuery, Indexer]:
         """Load the graph and build query API."""
         target = Path(path).resolve()
         indexer = Indexer(target)
@@ -393,8 +382,7 @@ class CodeGraphServer:
         output_lines = [f"Found {len(results)} results for '{query}':"]
         for r in results:
             output_lines.append(
-                f"  - {r['name']} ({r['kind']}) "
-                f"in {r['file']}:{r['line']}"
+                f"  - {r['name']} ({r['kind']}) in {r['file']}:{r['line']}"
             )
             if r.get("signature"):
                 output_lines.append(f"    Signature: {r['signature']}")
@@ -457,8 +445,7 @@ class CodeGraphServer:
         output_lines = [f"Found {len(functions)} functions:"]
         for f in functions:
             output_lines.append(
-                f"  - {f['name']} ({f['kind']}) "
-                f"in {f['file']}:{f['line']}"
+                f"  - {f['name']} ({f['kind']}) in {f['file']}:{f['line']}"
             )
 
         return [TextContent(type="text", text="\n".join(output_lines))]
@@ -480,9 +467,7 @@ class CodeGraphServer:
 
         output_lines = [f"Found {len(classes)} classes/structs:"]
         for c in classes:
-            output_lines.append(
-                f"  - {c['name']} in {c['file']}:{c['line']}"
-            )
+            output_lines.append(f"  - {c['name']} in {c['file']}:{c['line']}")
 
         return [TextContent(type="text", text="\n".join(output_lines))]
 
@@ -506,14 +491,10 @@ class CodeGraphServer:
             names = ", ".join(imp.get("names", []))
             if names:
                 output_lines.append(
-                    f"  - from {imp['module']} import {names} "
-                    f"(line {imp['line']})"
+                    f"  - from {imp['module']} import {names} (line {imp['line']})"
                 )
             else:
-                output_lines.append(
-                    f"  - import {imp['module']} "
-                    f"(line {imp['line']})"
-                )
+                output_lines.append(f"  - import {imp['module']} (line {imp['line']})")
 
         return [TextContent(type="text", text="\n".join(output_lines))]
 
