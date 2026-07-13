@@ -142,6 +142,19 @@ examples:
         help="Output file path (default: stdout)",
     )
 
+    # mcp subcommand
+    mcp_parser = subparsers.add_parser(
+        "mcp", help="Start MCP server for AI agent integration"
+    )
+    mcp_parser.add_argument(
+        "--index",
+        help="Path to the codebase to index (required for non-stdio mode)",
+    )
+    mcp_parser.add_argument(
+        "--cache",
+        help="Cache directory for incremental indexing",
+    )
+
     return parser
 
 
@@ -160,6 +173,8 @@ def main(argv: list[str] | None = None) -> int:
         return cmd_query(args)
     elif args.command == "resolve":
         return cmd_resolve(args)
+    elif args.command == "mcp":
+        return cmd_mcp(args)
 
     return 0
 
@@ -323,6 +338,29 @@ def cmd_resolve(args: argparse.Namespace) -> int:
         print(f"Written to {out_path}", file=sys.stderr)
     else:
         print(output)
+
+    return 0
+
+
+def cmd_mcp(args: argparse.Namespace) -> int:
+    """Handle the 'mcp' command."""
+    try:
+        import anyio
+        from codegraph.mcp_server import serve
+    except ImportError:
+        print(
+            "Error: MCP server requires the 'mcp' extra. Install with: pip install codegraph[mcp]",
+            file=sys.stderr,
+        )
+        return 1
+
+    cache_dir = getattr(args, "cache", None)
+
+    # Run the MCP server
+    try:
+        anyio.run(serve, cache_dir=cache_dir)
+    except KeyboardInterrupt:
+        return 0
 
     return 0
 
