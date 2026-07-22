@@ -14,3 +14,9 @@
 - Output formatters: JSON, Markdown, Stats
 - File discovery with configurable include/exclude patterns
 - 90 passing tests covering all modules
+
+## [0.1.1] - 2026-07-22
+
+### Changed
+- Maintenance: CI workflow, dependency verification
+- Updated anyio and ruff dev dependencies
